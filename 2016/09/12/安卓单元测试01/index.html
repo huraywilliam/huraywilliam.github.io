@@ -113,7 +113,41 @@ public class MyTest extends ActivityInstrumentationTestCase2 {
         Thread.sleep(5000);
     }
 }
-</code></pre>
+</code></pre><h3 id="Instrumentation认识"><a href="#Instrumentation认识" class="headerlink" title="Instrumentation认识"></a>Instrumentation认识</h3><ul>
+<li><img src="http://i.imgur.com/rDlIlUF.png" alt=""></li>
+</ul>
+<pre><code>public void testLink() throws Exception {
+
+   //获取仪表盘对象，不需要new，在启动的时候已经注入
+   Instrumentation instrumentation = getInstrumentation();
+
+   //创建意图过滤器
+   IntentFilter intentFilter = new IntentFilter(Intent.ACTION_VIEW);
+   //指明感兴趣的意图为http
+   intentFilter.addDataScheme(&quot;http&quot;);
+   //类型为浏览器
+   intentFilter.addCategory(Intent.CATEGORY_BROWSABLE);
+
+   //将监听器添加到仪表盘对象的监听列表中
+   Instrumentation.ActivityMonitor activityMonitor = instrumentation.addMonitor(intentFilter,null,false);
+
+   TextView link = (TextView) getActivity().findViewById(R.id.link);
+
+   //测试内容
+   assertEquals(0,activityMonitor.getHits());
+   TouchUtils.clickView(this,link);
+   activityMonitor.waitForActivityWithTimeout(5000);
+   assertEquals(1,activityMonitor.getHits());
+
+   //移除监听器
+   instrumentation.removeMonitor(activityMonitor);
+
+  }
+</code></pre><h3 id="ActivityInstrumentationTestCase2认识"><a href="#ActivityInstrumentationTestCase2认识" class="headerlink" title="ActivityInstrumentationTestCase2认识"></a>ActivityInstrumentationTestCase2认识</h3><ul>
+<li><img src="http://i.imgur.com/btGYA7r.png" alt=""></li>
+</ul>
+<p>ActivityInstrumentationTestCase2主要用来对<strong>单个活动</strong>执行功能测试，通过InstrumentationTestCase.launchActivity()来创建待测活动，在待测应用的ui线程上执行测试函数。</p>
+
       
     </div>
     <footer>
@@ -148,7 +182,7 @@ public class MyTest extends ActivityInstrumentationTestCase2 {
 
 
 <section id="comment">
-  <h1 class="title">Comments</h1>
+  <h1 class="title">Kommentare</h1>
 
   
 </section>
