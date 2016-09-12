@@ -99,10 +99,10 @@
   <div class="post-content">
     <header>
       
-      <time datetime="2016-09-12T06:48:03.000Z"><a href="/2016/09/12/中文！！！/">Mon, Sep 12 2016, 2:48:03 pm</a></time>
+      <time datetime="2016-09-12T06:48:03.916Z"><a href="/2016/09/12/中文！！！/">Mon, Sep 12 2016, 2:48:03 pm</a></time>
 
   
-    <h1 class="title"><a href="/2016/09/12/中文！！！/">中文！！！</a></h1>
+    <h1 class="title"><a href="/2016/09/12/中文！！！/"></a></h1>
   
 
 
@@ -112,7 +112,30 @@
     </header>
     <div class="entry">
       
-        
+        <h1 id="安卓单元测试-一"><a href="#安卓单元测试-一" class="headerlink" title="安卓单元测试(一)"></a>安卓单元测试(一)</h1><h3 id="新建AndroidTest"><a href="#新建AndroidTest" class="headerlink" title="新建AndroidTest"></a>新建AndroidTest</h3><ul>
+<li><img src="http://i.imgur.com/x861JLu.png" alt=""></li>
+</ul>
+<p>继承自 ActivityInstrumentationTestCase2</p>
+<pre><code>public class MyTest extends ActivityInstrumentationTestCase2 {
+    public MyTest() {
+        //这一行非常重要，否则会报空指针，需要指定测试哪个activity，不能盲目继承
+        super(MainActivity.class);
+    }
+
+    public void testFirst() throws Exception{
+        final MainActivity activity = (MainActivity) getActivity();
+        assertNotNull(activity);
+        final Button button = (Button) activity.findViewById(R.id.btn);
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                button.performClick();
+            }
+        });
+        Thread.sleep(5000);
+    }
+}
+</code></pre>
       
     </div>
     <footer>
@@ -148,10 +171,10 @@
   <div class="post-content">
     <header>
       
-      <time datetime="2016-09-12T06:47:49.000Z"><a href="/2016/09/12/English/">Mon, Sep 12 2016, 2:47:49 pm</a></time>
+      <time datetime="2016-09-12T06:47:49.083Z"><a href="/2016/09/12/English/">Mon, Sep 12 2016, 2:47:49 pm</a></time>
 
   
-    <h1 class="title"><a href="/2016/09/12/English/">English</a></h1>
+    <h1 class="title"><a href="/2016/09/12/English/"></a></h1>
   
 
 
@@ -161,7 +184,30 @@
     </header>
     <div class="entry">
       
-        
+        <h1 id="安卓单元测试-一"><a href="#安卓单元测试-一" class="headerlink" title="安卓单元测试(一)"></a>安卓单元测试(一)</h1><h3 id="新建AndroidTest"><a href="#新建AndroidTest" class="headerlink" title="新建AndroidTest"></a>新建AndroidTest</h3><ul>
+<li><img src="http://i.imgur.com/x861JLu.png" alt=""></li>
+</ul>
+<p>继承自 ActivityInstrumentationTestCase2</p>
+<pre><code>public class MyTest extends ActivityInstrumentationTestCase2 {
+    public MyTest() {
+        //这一行非常重要，否则会报空指针，需要指定测试哪个activity，不能盲目继承
+        super(MainActivity.class);
+    }
+
+    public void testFirst() throws Exception{
+        final MainActivity activity = (MainActivity) getActivity();
+        assertNotNull(activity);
+        final Button button = (Button) activity.findViewById(R.id.btn);
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                button.performClick();
+            }
+        });
+        Thread.sleep(5000);
+    }
+}
+</code></pre>
       
     </div>
     <footer>
