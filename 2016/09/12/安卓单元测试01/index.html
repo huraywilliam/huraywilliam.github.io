@@ -3,13 +3,21 @@
 <head>
   <meta charset="utf-8">
   
-  <title>安卓单元测试01 | huray</title>
+  <title>huray</title>
   <meta name="author" content="John Doe">
+  
+  <meta name="description" content="安卓单元测试(一)新建AndroidTest
+
+
+继承自 ActivityInstrumentationTestCase2
+public class MyTest extends ActivityInstrumentationTestCase2 {
+    public MyTest() {
+   ">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <meta property="og:title" content="安卓单元测试01"/>
+  
   <meta property="og:site_name" content="huray"/>
 
   
@@ -69,10 +77,10 @@
   <div class="post-content">
     <header>
       
-      <time datetime="2016-09-12T07:18:26.000Z"><a href="/2016/09/12/安卓单元测试01/">Mon, Sep 12 2016, 3:18:26 pm</a></time>
+      <time datetime="2016-09-12T07:18:26.710Z"><a href="/2016/09/12/安卓单元测试01/">Mon, Sep 12 2016, 3:18:26 pm</a></time>
 
   
-    <h1 class="title">安卓单元测试01</h1>
+    <h1 class="title"></h1>
   
 
 
@@ -82,7 +90,30 @@
     </header>
     <div class="entry">
       
-        
+        <h1 id="安卓单元测试-一"><a href="#安卓单元测试-一" class="headerlink" title="安卓单元测试(一)"></a>安卓单元测试(一)</h1><h3 id="新建AndroidTest"><a href="#新建AndroidTest" class="headerlink" title="新建AndroidTest"></a>新建AndroidTest</h3><ul>
+<li><img src="http://i.imgur.com/x861JLu.png" alt=""></li>
+</ul>
+<p>继承自 ActivityInstrumentationTestCase2</p>
+<pre><code>public class MyTest extends ActivityInstrumentationTestCase2 {
+    public MyTest() {
+        //这一行非常重要，否则会报空指针，需要指定测试哪个activity，不能盲目继承
+        super(MainActivity.class);
+    }
+
+    public void testFirst() throws Exception{
+        final MainActivity activity = (MainActivity) getActivity();
+        assertNotNull(activity);
+        final Button button = (Button) activity.findViewById(R.id.btn);
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                button.performClick();
+            }
+        });
+        Thread.sleep(5000);
+    }
+}
+</code></pre>
       
     </div>
     <footer>
@@ -117,7 +148,7 @@
 
 
 <section id="comment">
-  <h1 class="title">Kommentare</h1>
+  <h1 class="title">Comments</h1>
 
   
 </section>
