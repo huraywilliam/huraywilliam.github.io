@@ -308,6 +308,51 @@
 
     Thread.sleep(5000);
 }
+</code></pre><p>###使用Robotium</p>
+<p>需要先添加robotium-solo的jar包</p>
+<pre><code>compile group: &apos;com.jayway.android.robotium&apos;, name: &apos;robotium-solo&apos;, version: &apos;5.6.1&apos;
+</code></pre><p>#</p>
+<pre><code>public class RobotiumTest extends ActivityInstrumentationTestCase2 {
+    private Solo solo;
+
+    public RobotiumTest() {
+        super(MainActivity.class);
+    }
+
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        solo = new Solo(getInstrumentation(), getActivity());
+    }
+
+    public void testRobo() throws Exception {
+        solo.clickOnText(&quot;添加&quot;);
+        solo.sleep(500);
+
+        solo.clickOnText(&quot;编辑&quot;);
+        solo.sleep(500);
+
+        EditText text = solo.getEditText(0);
+        solo.clearEditText(text);
+        solo.enterText(text, &quot;huray!!!&quot;);
+
+        text = solo.getEditText(1);
+        solo.clearEditText(text);
+        solo.enterText(text, &quot;  你好厉害啊  &quot;);
+
+        text = solo.getEditText(2);
+        solo.clearEditText(text);
+        solo.enterText(text, &quot;2016-09-13！！！&quot;);
+
+
+        solo.clickOnText(&quot;保存&quot;);
+        solo.sleep(5000);
+
+    }
+
+
+}
 </code></pre>
       
     </div>
