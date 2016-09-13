@@ -252,8 +252,7 @@ public class MyTest extends ActivityInstrumentationTestCase2 {
 
     }
 }
-</code></pre><p>###sendKeys()与sendRepeatedKeys()</p>
-<pre><code>public void testSendKey2() throws Exception{
+</code></pre><h3 id="sendKeys-与sendRepeatedKeys"><a href="#sendKeys-与sendRepeatedKeys" class="headerlink" title="sendKeys()与sendRepeatedKeys()"></a>sendKeys()与sendRepeatedKeys()</h3><pre><code>public void testSendKey2() throws Exception{
     final EditText textTitle = (EditText) activity.findViewById(R.id.author);
 
     activity.runOnUiThread(new Runnable() {
@@ -286,8 +285,7 @@ public class MyTest extends ActivityInstrumentationTestCase2 {
 
     Thread.sleep(5000);
 }
-</code></pre><p>###使用Robotium</p>
-<p>需要先添加robotium-solo的jar包</p>
+</code></pre><h3 id="使用Robotium"><a href="#使用Robotium" class="headerlink" title="使用Robotium"></a>使用Robotium</h3><p>需要先添加robotium-solo的jar包</p>
 <pre><code>compile group: &apos;com.jayway.android.robotium&apos;, name: &apos;robotium-solo&apos;, version: &apos;5.6.1&apos;
 </code></pre><p>#</p>
 <pre><code>public class RobotiumTest extends ActivityInstrumentationTestCase2 {
@@ -366,7 +364,7 @@ public class MyTest extends ActivityInstrumentationTestCase2 {
 
 
 <section id="comment">
-  <h1 class="title">Kommentare</h1>
+  <h1 class="title">Comments</h1>
 
   
 </section>
