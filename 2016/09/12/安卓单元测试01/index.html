@@ -252,6 +252,40 @@ public class MyTest extends ActivityInstrumentationTestCase2 {
 
     }
 }
+</code></pre><p>####sendKeys()与sendRepeatedKeys()</p>
+<pre><code>public void testSendKey2() throws Exception{
+    final EditText textTitle = (EditText) activity.findViewById(R.id.author);
+
+    activity.runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+            textTitle.setText(&quot;&quot;);
+            textTitle.requestFocus();
+        }
+    });
+
+    sendRepeatedKeys(20,KeyEvent.KEYCODE_DEL);
+
+    sendKeys(&quot;SHIFT_LEFT M 2*O N L I G H T ALT_LEFT 1 DPAD_DOWN&quot;);
+    Thread.sleep(3000);
+
+    sendRepeatedKeys(20,KeyEvent.KEYCODE_DEL,
+            1,KeyEvent.KEYCODE_SHIFT_LEFT,
+            1,KeyEvent.KEYCODE_M,
+            1,KeyEvent.KEYCODE_O,
+            1,KeyEvent.KEYCODE_O,
+            1,KeyEvent.KEYCODE_N,
+            1,KeyEvent.KEYCODE_L,
+            1,KeyEvent.KEYCODE_I,
+            1,KeyEvent.KEYCODE_G,
+            1,KeyEvent.KEYCODE_H,
+            1,KeyEvent.KEYCODE_T,
+            1,KeyEvent.KEYCODE_ALT_LEFT,
+            1,KeyEvent.KEYCODE_1,
+            1,KeyEvent.KEYCODE_DPAD_DOWN);
+
+    Thread.sleep(5000);
+}
 </code></pre>
       
     </div>
