@@ -169,7 +169,112 @@
 <li><img src="http://i.imgur.com/btGYA7r.png" alt=""></li>
 </ul>
 <p>ActivityInstrumentationTestCase2主要用来对<strong>单个活动</strong>执行功能测试，通过InstrumentationTestCase.launchActivity()来创建待测活动，在待测应用的ui线程上执行测试函数。</p>
+<pre><code>public class MyTexst extends ActivityInstrumentationTestCase2&lt;SpinnerActivity&gt; {
+    public MyTexst() {
+        super(SpinnerActivity.class);
+    }
 
+    //下拉框元素个数
+    public static final int ADAPTER_COUNT = 9;
+
+    public static final int TEST_POSITION = 5;
+
+    //初始位置
+    public static final int INITIAL_POSITION = 0;
+
+    private SpinnerActivity mActivity;
+
+    //显示的文本
+    private String mSelection;
+
+    //下拉框当前位置
+    private int mPos;
+
+    private Spinner mSpinner;
+
+    private SpinnerAdapter mPlanetData;
+
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        //关闭待测应用的触控模式，必须在getActivity()之前
+        setActivityInitialTouchMode(false);
+
+        mActivity = getActivity();
+
+        mSpinner = (Spinner) mActivity.findViewById(R.id.Spinner01);
+        mPlanetData = mSpinner.getAdapter();
+    }
+
+    public void testSpinner() throws Exception {
+        //确保待测下拉框的选择元素的回调函数被正确设置
+        assertTrue(mSpinner.getOnItemSelectedListener() != null);
+
+        //验证下拉框数据正常初始化
+        assertTrue(mPlanetData != null);
+
+        //元素个数是否正确
+        assertEquals(ADAPTER_COUNT,mPlanetData.getCount());
+
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                //设置焦点
+                mSpinner.requestFocus();
+                //初始值
+                mSpinner.setSelection(INITIAL_POSITION);
+            }
+        });
+
+        Thread.sleep(2000);
+
+        //中键
+        this.sendKeys(KeyEvent.KEYCODE_DPAD_CENTER);
+
+        // send 5 down arrow keys to the spinner
+
+        for (int i = 1; i &lt;= TEST_POSITION; i++) {
+
+            this.sendKeys(KeyEvent.KEYCODE_DPAD_DOWN);
+            Thread.sleep(2000);
+        }
+
+        // select the item at the current spinner position
+
+        this.sendKeys(KeyEvent.KEYCODE_DPAD_CENTER);
+
+        // get the position of the selected item
+
+        mPos = mSpinner.getSelectedItemPosition();
+
+        /*
+         * from the spinner&apos;s data mLocalAdapter, get the object at the selected position
+         * (this is a String value)
+         */
+
+        mSelection = (String)mSpinner.getItemAtPosition(mPos);
+
+        /*
+         * Get the TextView widget that displays the result of selecting an item from the spinner
+         */
+
+        TextView resultView =
+                (TextView) mActivity.findViewById(com.android.example.spinner.R.id.SpinnerResult);
+
+        // Get the String value in the EditText object
+
+        String resultText = (String) resultView.getText();
+
+        /*
+         * Confirm that the EditText contains the same value as the data in the mLocalAdapter
+         */
+
+        assertEquals(resultText,mSelection);
+
+    }
+}
+</code></pre>
       
     </div>
     <footer>
