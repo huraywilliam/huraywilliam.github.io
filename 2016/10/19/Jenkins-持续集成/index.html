@@ -6,12 +6,12 @@
   <title>huray</title>
   <meta name="author" content="John Doe">
   
-  <meta name="description" content="Jenkins 持续集成需要安装maven，openjdk，mono，apache，apache，apache。打包成一个install.sh执行自动安装
+  <meta name="description" content="Jenkins 搭建.net java持续集成环境需要安装maven，openjdk，mono，apache，subversion，jenkins。为了方便，打包成一个install.sh执行自动安装。
 #/bin/sh
 
 #安装maven
 cd /opt
-wget http://apache.fayea.com/maven/maven-3/3.">
+wget http://apache.fa">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -89,7 +89,7 @@ wget http://apache.fayea.com/maven/maven-3/3.">
     </header>
     <div class="entry">
       
-        <h1 id="Jenkins-持续集成"><a href="#Jenkins-持续集成" class="headerlink" title="Jenkins 持续集成"></a>Jenkins 持续集成</h1><p>需要安装maven，openjdk，mono，apache，apache，apache。打包成一个install.sh<br>执行自动安装</p>
+        <h1 id="Jenkins-搭建-net-java持续集成环境"><a href="#Jenkins-搭建-net-java持续集成环境" class="headerlink" title="Jenkins 搭建.net java持续集成环境"></a>Jenkins 搭建.net java持续集成环境</h1><p>需要安装maven，openjdk，mono，apache，subversion，jenkins。<br>为了方便，打包成一个install.sh执行自动安装。</p>
 <pre><code>#/bin/sh
 
 #安装maven
@@ -166,43 +166,57 @@ svnserve -dr /var/svn
 wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
 rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
 yum install -y jenkins
-</code></pre><p>##安装jenkins插件</p>
+chkconfig jenkins on
+service jenkins restart
+</code></pre><h2 id="jenkins-插件安装与系统配置"><a href="#jenkins-插件安装与系统配置" class="headerlink" title="jenkins 插件安装与系统配置"></a>jenkins 插件安装与系统配置</h2><p>登录<a href="http://192.168.8.65:8080/" target="_blank" rel="external">http://192.168.8.65:8080/</a> 配置好用户名与密码</p>
+<p>先安装以下jenkins插件</p>
 <ul>
 <li>MSBuild Plugin</li>
 <li>Subversion Plug-in</li>
 <li>Hudson Post build task</li>
 <li>Maven Integration plugin</li>
 </ul>
-<p>##配置jenkins</p>
-<pre><code>系统管理-Global Tool Configuration
-配置MSBuild
+<p>在系统管理，管理插件，可选插件中直接安装<br><img src="http://i.imgur.com/qVRyF5Y.jpg" alt=""></p>
+<p><strong>配置Maven 和 MSBuild 选项</strong></p>
+<p>进入系统管理-Global Tool Configuration</p>
+<pre><code>配置MSBuild
 Name = mono
 Path to MSBuild    = /usr/bin/xbuild
-配置Maven
+</code></pre><p><img src="http://i.imgur.com/DxrQqsA.jpg" alt=""></p>
+<pre><code>配置Maven
 Name = Maven_Build
 MAVEN_HOME = /opt/apache-maven-3.3.9
-</code></pre><p>##DTU .net application项目配置</p>
-<p><img src="http://i.imgur.com/aeJhW2x.jpg" alt=""><br>    构建后操作<br>    <img src="http://i.imgur.com/kRgPtDw.jpg" alt=""></p>
-<pre><code>Log text    \b0\s+(Error\(s\))
+</code></pre><p><img src="http://i.imgur.com/5o8OtD3.jpg" alt=""></p>
+<p><strong>配置svn认证credentials</strong></p>
+<p>Jenkins-Credentials-System-add credentials</p>
+<pre><code>添加svn用户名和密码
+</code></pre><p><img src="http://i.imgur.com/phEK4TS.jpg" alt=""></p>
+<h2 id="创建可持续构建项目"><a href="#创建可持续构建项目" class="headerlink" title="创建可持续构建项目"></a>创建可持续构建项目</h2><p><strong>创建.net application项目配置-DTU</strong></p>
+<pre><code>1.新建，选择“构建一个自由风格的软件项目”
+</code></pre><p><img src="http://i.imgur.com/yV6frQJ.jpg" alt=""></p>
+<pre><code>2.配置svn地址
+</code></pre><p><img src="http://i.imgur.com/Yfs31lX.jpg" alt=""></p>
+<pre><code>3.配置构建
+</code></pre><p><img src="http://i.imgur.com/N8FA0dR.jpg" alt=""></p>
+<pre><code>3.配置构建后操作
+#新增Post build task处理编译成功后的步骤
+Log text  = \b0\s+(Error\(s\))    //匹配编译成功
 
+#新增shell命令
 filename=$(date +%Y%m%d%H%M)
-
-if [  -d &quot;Release/bin/Release&quot; ]
-then
-  mv Release/bin/Release/ Release/bin/bin
-  cp -r /huray/commonfiles/dtu/config Release/bin
-
-
-  if [  -f &quot;/var/www/html/dtu/release/Release.zip&quot; ]
+if [  -f &quot;/var/www/html/dtu/release/Release.zip&quot; ]
       then
           mv /var/www/html/dtu/release/Release.zip /var/www/html/dtu/backup/dtu-$filename.zip
-
-  fi
-
-
-  zip -qr /var/www/html/dtu/release/Release.zip  Release/bin
+    fi
+    zip -qr /var/www/html/dtu/release/Release.zip  Release/bin
 fi
-</code></pre><p>##Java application项目配置<br><img src="http://i.imgur.com/RYJSvtu.jpg" alt=""></p>
+</code></pre><p><img src="http://i.imgur.com/aeJhW2x.jpg" alt=""></p>
+<p>Usage：</p>
+<ol>
+<li>构建成功后访问 <a href="http://192.168.8.65/dtu/release/" target="_blank" rel="external">http://192.168.8.65/dtu/release/</a> 会产生 Release.zip包</li>
+<li>构建成功后，以往的构建会在<a href="http://192.168.8.65/dtu/backup/" target="_blank" rel="external">http://192.168.8.65/dtu/backup/</a> 中备份</li>
+</ol>
+<p>##Java application项目配置<br><img src="http://i.imgur.com/RYJSvtu.jpg" alt=""></p>
 <p>   #首先需要修改pom.xml 添加build参数</p>
 <pre><code>&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;
   &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
