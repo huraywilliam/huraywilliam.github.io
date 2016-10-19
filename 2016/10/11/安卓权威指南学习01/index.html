@@ -6,10 +6,12 @@
   <title>huray</title>
   <meta name="author" content="John Doe">
   
-  <meta name="description" content="安卓单元测试(二)Monkey命令monkey [选项] &amp;lt;要生成的消息个数&amp;gt;
-# 
-adb shell monkey -p com.ray.myapplication1 -v -v 10
-测试Android服务组件">
+  <meta name="description" content="安卓权威指南学习01##intent说明
+intent是组件与操作系统通信的一种媒介工具
+要启动另外一个activity，intent会告诉activitymanager，让activitymanager来启动对应的activity
+##fragment说明
+
+public void onCreat">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -74,7 +76,7 @@ adb shell monkey -p com.ray.myapplication1 -v -v 10
   <div class="post-content">
     <header>
       
-      <time datetime="2016-09-13T07:46:48.771Z"><a href="/2016/09/13/安卓单元测试02/">Tue, Sep 13 2016, 3:46:48 pm</a></time>
+      <time datetime="2016-10-11T03:57:48.149Z"><a href="/2016/10/11/安卓权威指南学习01/">Tue, Oct 11 2016, 11:57:48 am</a></time>
 
   
     <h1 class="title"></h1>
@@ -87,10 +89,22 @@ adb shell monkey -p com.ray.myapplication1 -v -v 10
     </header>
     <div class="entry">
       
-        <h1 id="安卓单元测试-二"><a href="#安卓单元测试-二" class="headerlink" title="安卓单元测试(二)"></a>安卓单元测试(二)</h1><h3 id="Monkey命令"><a href="#Monkey命令" class="headerlink" title="Monkey命令"></a>Monkey命令</h3><pre><code>monkey [选项] &lt;要生成的消息个数&gt;
-</code></pre><p># </p>
-<pre><code>adb shell monkey -p com.ray.myapplication1 -v -v 10
-</code></pre><h3 id="测试Android服务组件"><a href="#测试Android服务组件" class="headerlink" title="测试Android服务组件"></a>测试Android服务组件</h3>
+        <h1 id="安卓权威指南学习01"><a href="#安卓权威指南学习01" class="headerlink" title="安卓权威指南学习01"></a>安卓权威指南学习01</h1><p>##intent说明</p>
+<p>intent是组件与操作系统通信的一种媒介工具</p>
+<p>要启动另外一个activity，intent会告诉activitymanager，让activitymanager来启动对应的activity</p>
+<p>##fragment说明</p>
+<ol>
+<li>public void onCreate 方法为公有，因为托管他的activity需要调用它</li>
+<li>public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) 该方法才是实例化视图布局</li>
+</ol>
+<p>3.</p>
+<p>##样式说明</p>
+<ol>
+<li>margin 外边距</li>
+<li>padding 内边距</li>
+<li>sp文字大小，dp其他内容大小</li>
+</ol>
+
       
     </div>
     <footer>
@@ -114,10 +128,8 @@ adb shell monkey -p com.ray.myapplication1 -v -v 10
           <div class="clearfix"></div>
           <nav id="pagination">
   
-    <a href="/2016/10/11/安卓权威指南学习01/" class="alignleft prev"><i class="fa fa-long-arrow-left"></i>Next</a>
   
-  
-    <a href="/2016/09/12/安卓单元测试01/" class="alignright next">Prev<i class="fa fa-long-arrow-right"></i></a>
+    <a href="/2016/09/13/安卓单元测试02/" class="alignright next">Prev<i class="fa fa-long-arrow-right"></i></a>
   
   <div class="clearfix"></div>
 </nav>
