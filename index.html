@@ -112,20 +112,22 @@
     </header>
     <div class="entry">
       
-        <h2 id="Jenkins-持续集成"><a href="#Jenkins-持续集成" class="headerlink" title="Jenkins 持续集成"></a>Jenkins 持续集成</h2><p>install shell</p>
-<pre><code>#安装maven
+        <h1 id="Jenkins-持续集成"><a href="#Jenkins-持续集成" class="headerlink" title="Jenkins 持续集成"></a>Jenkins 持续集成</h1><p>需要安装maven，openjdk，mono，apache，apache，apache。打包成一个install.sh<br>执行自动安装</p>
+<pre><code>#/bin/sh
+
+#安装maven
 cd /opt
 wget http://apache.fayea.com/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.zip
 unzip apache-maven-3.3.9-bin.zip
 
+
 #安装openjdk 1.8.0
 yum install -y java-1.8.0-openjdk-devel
+
+
 #setup JAVA_HOME
-
-
 sed -i &apos;$a\export PATH=/opt/apache-maven-3.3.9/bin:$PATH&apos; /etc/profile
 sed -i &apos;$a\export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.102-1.b14.el7_2.x86_64&apos; /etc/profile
-
 source /etc/profile
 
 
@@ -133,59 +135,54 @@ source /etc/profile
 yum install -y yum-utils
 rpm --import &quot;http://keyserver.ubuntu.com/pks/lookup?op=get&amp;search=0x3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF&quot;
 yum-config-manager --add-repo http://download.mono-project.com/repo/centos/
-
 yum install -y mono-devel
 yum install -y mono-complete
 yum install -y referenceassemblies-pcl
 
+
 #安装apache
 yum install -y httpd
 systemctl enable httpd.service
-#删掉welcome文件
+###删掉welcome文件
 rm -rf /etc/httpd/conf.d/autoindex.conf
-rm - rf /etc/httpd/conf.d/welcome.conf
-#添加列目录选项
-vi /etc/httpd/conf/httpd.conf 
-    Options Indexes FollowSymLinks
+rm -rf /etc/httpd/conf.d/welcome.conf
+###添加列目录选项
+sed -i &apos;/&lt;Directory &quot;\/var\/www&quot;&gt;/a\    Options Indexes FollowSymLinks&apos; /etc/httpd/conf/httpd.conf
 service httpd restart
-
-#对documentroot目录设置权限
+###添加web目录
+mkdir -p /var/www/html/carsimulate/backup
+mkdir -p /var/www/html/carsimulate/release
+mkdir -p /var/www/html/dtu/backup
+mkdir -p /var/www/html/dtu/release
+mkdir -p /var/www/html/garbage/backup
+mkdir -p /var/www/html/garbage/release
+###对documentroot目录设置权限,允许jenkins shell能访问
 cd /var/www/
 chmod -R 777 html/
 
 
-
 #安装subversion
 yum install -y subversion
+###create svn rootdir
 mkdir -p /var/svn
+###建立版本库
 svnadmin create /var/svn/test
-vi /var/svn/test/conf/svnserve.conf
-
-[general]
-anon-access = none                #控制非鉴权用户访问版本库的权限
-auth-access = write                 #控制鉴权用户访问版本库的权限
-password-db = passwd           #指定用户名口令文件名
-authz-db = authz                     #指定权限配置文件名
-realm = test                   #指定版本库的认证域，即在登录时提示的认证域名称
-
-vi /var/svn/test/conf/passwd
-
-[users]
-root = pass
-
-vi /var/svn/test/conf/authz
-[groups]
-admin = root
-
-[test:/]
-@admin = rw
-
+###配置svnserver
+ sed -i &apos;/\[general\]/a\anon-access = none&apos; /var/svn/test/conf/svnserve.conf    #控制非鉴权用户访问版本库的权限
+ sed -i &apos;/\[general\]/a\auth-access = write&apos; /var/svn/test/conf/svnserve.conf   #控制鉴权用户访问版本库的权限
+ sed -i &apos;/\[general\]/a\password-db = passwd&apos; /var/svn/test/conf/svnserve.conf  #指定用户名口令文件名
+ sed -i &apos;/\[general\]/a\authz-db = authz&apos; /var/svn/test/conf/svnserve.conf      #指定权限配置文件名
+ sed -i &apos;/\[general\]/a\realm = test&apos; /var/svn/test/conf/svnserve.conf          #指定版本库的认证域，即在登录时提示的认证域名称          
+###添加user&amp;pass
+sed -i &apos;/\[users\]/a\root = pass&apos; /var/svn/test/conf/passwd
+###配置项目权限
+sed -i &apos;/\[groups\]/a\admin = root&apos; /var/svn/test/conf/authz
+sed -i &apos;$a\[test:/]&apos; /var/svn/test/conf/authz
+sed -i &apos;$a\@admin = rw&apos; /var/svn/test/conf/authz
+###添加自启动
+systemctl enable svnserve.service
 ###start svn
 svnserve -dr /var/svn
-
-systemctl enable svnserve.service
-systemctl start svnserve.service
-systemctl stop svnserve.service
 
 
 #安装jenkins
