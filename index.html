@@ -99,6 +99,287 @@
   <div class="post-content">
     <header>
       
+      <time datetime="2016-10-19T05:51:14.159Z"><a href="/2016/10/19/Jenkins-持续集成/">Wed, Oct 19 2016, 1:51:14 pm</a></time>
+
+  
+    <h1 class="title"><a href="/2016/10/19/Jenkins-持续集成/"></a></h1>
+  
+
+
+
+<div class="clear"></div>
+      
+    </header>
+    <div class="entry">
+      
+        <h2 id="Jenkins-持续集成"><a href="#Jenkins-持续集成" class="headerlink" title="Jenkins 持续集成"></a>Jenkins 持续集成</h2><p>install shell</p>
+<pre><code>#安装maven
+cd /opt
+wget http://apache.fayea.com/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.zip
+unzip apache-maven-3.3.9-bin.zip
+
+#安装openjdk 1.8.0
+yum install -y java-1.8.0-openjdk-devel
+#setup JAVA_HOME
+
+
+sed -i &apos;$a\export PATH=/opt/apache-maven-3.3.9/bin:$PATH&apos; /etc/profile
+sed -i &apos;$a\export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.102-1.b14.el7_2.x86_64&apos; /etc/profile
+
+source /etc/profile
+
+
+#安装mono
+yum install -y yum-utils
+rpm --import &quot;http://keyserver.ubuntu.com/pks/lookup?op=get&amp;search=0x3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF&quot;
+yum-config-manager --add-repo http://download.mono-project.com/repo/centos/
+
+yum install -y mono-devel
+yum install -y mono-complete
+yum install -y referenceassemblies-pcl
+
+#安装apache
+yum install -y httpd
+systemctl enable httpd.service
+#删掉welcome文件
+rm -rf /etc/httpd/conf.d/autoindex.conf
+rm - rf /etc/httpd/conf.d/welcome.conf
+#添加列目录选项
+vi /etc/httpd/conf/httpd.conf 
+    Options Indexes FollowSymLinks
+service httpd restart
+
+#对documentroot目录设置权限
+cd /var/www/
+chmod -R 777 html/
+
+
+
+#安装subversion
+yum install -y subversion
+mkdir -p /var/svn
+svnadmin create /var/svn/test
+vi /var/svn/test/conf/svnserve.conf
+
+[general]
+anon-access = none                #控制非鉴权用户访问版本库的权限
+auth-access = write                 #控制鉴权用户访问版本库的权限
+password-db = passwd           #指定用户名口令文件名
+authz-db = authz                     #指定权限配置文件名
+realm = test                   #指定版本库的认证域，即在登录时提示的认证域名称
+
+vi /var/svn/test/conf/passwd
+
+[users]
+root = pass
+
+vi /var/svn/test/conf/authz
+[groups]
+admin = root
+
+[test:/]
+@admin = rw
+
+###start svn
+svnserve -dr /var/svn
+
+systemctl enable svnserve.service
+systemctl start svnserve.service
+systemctl stop svnserve.service
+
+
+#安装jenkins
+wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
+rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+yum install -y jenkins
+</code></pre><p>##安装jenkins插件</p>
+<ul>
+<li>MSBuild Plugin</li>
+<li>Subversion Plug-in</li>
+<li>Hudson Post build task</li>
+<li>Maven Integration plugin</li>
+</ul>
+<p>##配置jenkins</p>
+<pre><code>系统管理-Global Tool Configuration
+配置MSBuild
+Name = mono
+Path to MSBuild    = /usr/bin/xbuild
+配置Maven
+Name = Maven_Build
+MAVEN_HOME = /opt/apache-maven-3.3.9
+</code></pre><p>##DTU .net application项目配置</p>
+<p><img src="http://i.imgur.com/aeJhW2x.jpg" alt=""><br>    构建后操作<br>    <img src="http://i.imgur.com/kRgPtDw.jpg" alt=""></p>
+<pre><code>Log text    \b0\s+(Error\(s\))
+
+filename=$(date +%Y%m%d%H%M)
+
+if [  -d &quot;Release/bin/Release&quot; ]
+then
+  mv Release/bin/Release/ Release/bin/bin
+  cp -r /huray/commonfiles/dtu/config Release/bin
+
+
+  if [  -f &quot;/var/www/html/dtu/release/Release.zip&quot; ]
+      then
+          mv /var/www/html/dtu/release/Release.zip /var/www/html/dtu/backup/dtu-$filename.zip
+
+  fi
+
+
+  zip -qr /var/www/html/dtu/release/Release.zip  Release/bin
+fi
+</code></pre><p>##Java application项目配置<br><img src="http://i.imgur.com/RYJSvtu.jpg" alt=""></p>
+<p>   #首先需要修改pom.xml 添加build参数</p>
+<pre><code>&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;
+  &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+  &lt;groupId&gt;CarSimulate&lt;/groupId&gt;
+  &lt;artifactId&gt;CarSimulate&lt;/artifactId&gt;
+  &lt;version&gt;1.0&lt;/version&gt;
+  &lt;build&gt;
+&lt;sourceDirectory&gt;src&lt;/sourceDirectory&gt;
+&lt;plugins&gt;
+  &lt;plugin&gt;
+    &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+    &lt;version&gt;3.3&lt;/version&gt;
+    &lt;configuration&gt;
+      &lt;source&gt;1.8&lt;/source&gt;
+      &lt;target&gt;1.8&lt;/target&gt;
+    &lt;/configuration&gt;
+  &lt;/plugin&gt;
+
+
+  &lt;plugin&gt;
+      &lt;artifactId&gt;maven-jar-plugin&lt;/artifactId&gt;
+      &lt;version&gt;2.4&lt;/version&gt;
+      &lt;configuration&gt;
+        &lt;source&gt;1.7&lt;/source&gt;
+        &lt;target&gt;1.7&lt;/target&gt;
+        &lt;archive&gt;
+          &lt;manifest&gt;
+            &lt;mainClass&gt;com.lj.entrance.BozhouProgram&lt;/mainClass&gt;
+            &lt;addClasspath&gt;true&lt;/addClasspath&gt;
+            &lt;classpathPrefix&gt;lib/&lt;/classpathPrefix&gt;
+          &lt;/manifest&gt;
+        &lt;/archive&gt;
+        &lt;classesDirectory /&gt; 
+      &lt;/configuration&gt;
+    &lt;/plugin&gt;
+
+
+
+    &lt;plugin&gt;  
+        &lt;artifactId&gt;maven-assembly-plugin&lt;/artifactId&gt;  
+        &lt;configuration&gt;  
+            &lt;appendAssemblyId&gt;false&lt;/appendAssemblyId&gt;  
+            &lt;descriptorRefs&gt;  
+                &lt;descriptorRef&gt;jar-with-dependencies&lt;/descriptorRef&gt;  
+            &lt;/descriptorRefs&gt;  
+            &lt;archive&gt;  
+                &lt;manifest&gt;  
+                    &lt;mainClass&gt;com.lj.entrance.BozhouProgram&lt;/mainClass&gt;  
+                &lt;/manifest&gt;  
+            &lt;/archive&gt;  
+        &lt;/configuration&gt;  
+        &lt;executions&gt;  
+            &lt;execution&gt;  
+                &lt;id&gt;make-assembly&lt;/id&gt;  
+                &lt;phase&gt;package&lt;/phase&gt;  
+                &lt;goals&gt;  
+                    &lt;goal&gt;assembly&lt;/goal&gt;  
+                &lt;/goals&gt;  
+            &lt;/execution&gt;  
+        &lt;/executions&gt;  
+    &lt;/plugin&gt;    
+&lt;/plugins&gt;
+  &lt;/build&gt;
+
+ &lt;dependencies&gt;
+ &lt;dependency&gt;
+    &lt;groupId&gt;org.jboss.netty&lt;/groupId&gt;
+    &lt;artifactId&gt;netty&lt;/artifactId&gt;
+    &lt;version&gt;3.2.7.Final&lt;/version&gt;
+&lt;/dependency&gt;
+ &lt;/dependencies&gt;
+&lt;/project&gt;
+
+
+
+#post setps
+
+filename=$(date +%Y%m%d%H%M)
+
+
+if [  -f &quot;/var/www/html/carsimulate/release/CarSimulate.zip&quot; ]
+      then
+          mv /var/www/html/carsimulate/release/CarSimulate.zip /var/www/html/carsimulate/backup/carsimulate-$filename.zip
+
+ fi
+
+mkdir Carsimulate
+cp -r config/ Carsimulate/
+cp target/CarSimulate-1.0.jar Carsimulate/
+
+zip -qr /var/www/html/carsimulate/release/CarSimulate.zip Carsimulate/
+
+rm -rf Carsimulate/
+</code></pre><p>##Garbage .net web项目配置</p>
+<pre><code>![](http://i.imgur.com/65TTRGa.jpg)
+
+
+
+#输出程序到指定目录
+/p:Configuration=Release /p:OutputPath=&quot;output/release&quot;
+
+
+
+#构建后操作
+filename=$(date +%Y%m%d%H%M)
+
+if [  -f &quot;/var/www/html/garbage/release/release.zip&quot; ]
+    then
+      mv /var/www/html/garbage/release/release.zip /var/www/html/garbage/backup/garbage-$filename.zip
+
+fi
+
+
+cd Com.Service.Web/output/release
+zip -qr /var/www/html/garbage/release/release.zip _PublishedWebsites/
+</code></pre>
+      
+    </div>
+    <footer>
+      
+        <div class="alignleft">
+            <a href="/2016/10/19/Jenkins-持续集成/#more" class="more-link"><i class="fa fa-chevron-right"></i>Read More</a>
+        </div>
+        
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+  <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
       <time datetime="2016-10-11T03:57:48.149Z"><a href="/2016/10/11/安卓权威指南学习01/">Tue, Oct 11 2016, 11:57:48 am</a></time>
 
   
