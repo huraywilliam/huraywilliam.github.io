@@ -6,12 +6,12 @@
   <title>huray</title>
   <meta name="author" content="John Doe">
   
-  <meta name="description" content="Jenkins 搭建.net java持续集成环境需要安装maven，openjdk，mono，apache，subversion，jenkins。为了方便，打包成一个install.sh执行自动安装。
+  <meta name="description" content="Jenkins 搭建.net java android持续集成环境需要安装maven，openjdk，mono，apache，subversion，jenkins。为了方便，打包成一个install.sh执行自动安装。
 #/bin/sh
 
 #安装maven
 cd /opt
-wget http://apache.fa">
+wget http://a">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -89,7 +89,7 @@ wget http://apache.fa">
     </header>
     <div class="entry">
       
-        <h1 id="Jenkins-搭建-net-java持续集成环境"><a href="#Jenkins-搭建-net-java持续集成环境" class="headerlink" title="Jenkins 搭建.net java持续集成环境"></a>Jenkins 搭建.net java持续集成环境</h1><p>需要安装maven，openjdk，mono，apache，subversion，jenkins。<br>为了方便，打包成一个install.sh执行自动安装。</p>
+        <h1 id="Jenkins-搭建-net-java-android持续集成环境"><a href="#Jenkins-搭建-net-java-android持续集成环境" class="headerlink" title="Jenkins 搭建.net java android持续集成环境"></a>Jenkins 搭建.net java android持续集成环境</h1><p>需要安装maven，openjdk，mono，apache，subversion，jenkins。<br>为了方便，打包成一个install.sh执行自动安装。</p>
 <pre><code>#/bin/sh
 
 #安装maven
@@ -216,6 +216,71 @@ fi
 <li>构建成功后访问 <a href="http://192.168.8.65/dtu/release/" target="_blank" rel="external">http://192.168.8.65/dtu/release/</a> 会产生 Release.zip包</li>
 <li>构建成功后，以往的构建会在<a href="http://192.168.8.65/dtu/backup/" target="_blank" rel="external">http://192.168.8.65/dtu/backup/</a> 中备份</li>
 </ol>
+<p>##Android 项目配置<br>安卓项目相对比较麻烦，需要安装project指定的构建工具版本</p>
+<p>先查看项目中的各个编译工具的版本</p>
+<pre><code>1.app/build.gradle
+compileSdkVersion 22    为安卓编译sdk的版本
+
+2.build.gradle
+classpath &apos;com.android.tools.build:gradle:2.1.2&apos; 为gradle的版本
+</code></pre><p>以自己的安卓项目Weather为例<br>需要先在settings.gradle中引用子project，并配置路径</p>
+<pre><code>include &apos;PullToRefresh&apos;
+project(&apos;:PullToRefresh&apos;).projectDir = new File(&apos;PullToRefresh&apos;)
+</code></pre><p>配置忽略lint静态扫描出错后继续执行编译，</p>
+<pre><code>修改app/build.gradle，添加
+lintOptions {
+      abortOnError false
+  }
+
+修改PullToRefresh/build.gradle，添加
+lintOptions {
+      abortOnError false
+  }
+</code></pre><p><strong>配置androidsdk，buildtool</strong></p>
+<pre><code>#安装android sdk 
+wget https://dl.google.com/android/android-sdk_r24.4.1-linux.tgz
+tar zxvf android-sdk_r24.4.1-linux.tgz  
+mv android-sdk-linux/ /opt/
+sed -i &apos;$a\export ANDROID_HOME=/opt/android-sdk-linux&apos; /etc/profile
+sed -i &apos;$a\export PATH=$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$PATH&apos; /etc/profile
+
+安装sdk版本 
+
+##更新全部sdk版本，从1到24
+#android update sdk --no-ui
+#只更新22，23版本
+android update sdk -u --filter platform-tools,android-22
+android update sdk -u --filter platform-tools,android-23
+
+##安装build tool
+##查询
+#android list sdk -a
+##获得list后，8 对应的build tool 为23
+android update sdk -a -u -t 8
+
+
+##更新Android Support Repository
+##android list sdk -a --extended  查询命令
+android update sdk --no-ui -a --filter &quot;extra-android-m2repository&quot;
+
+#安装gradle
+#安装 2.10版本
+
+https://services.gradle.org/distributions/gradle-2.10-all.zip
+unzip gradle-2.10-all.zip
+mv gradle-2.10 /opt
+
+sed -i &apos;$a\export PATH=/opt/gradle-2.10/bin:$PATH&apos; /etc/profile
+
+#安卓build tools相关类库
+yum install -y glibc.i686 glibc-devel.i686 libstdc++.i686 zlib-devel.i686 ncurses-devel.i686 libX11-devel.i686 libXrender.i686 libXrandr.i686
+
+#刷新环境变量
+source /etc/profile
+</code></pre><p><strong>jenkins配置</strong><br>1.需要先配置ANDROID_HOME的环境变量，否则会报错<br><img src="http://i.imgur.com/4gjKbnf.jpg" alt=""></p>
+<p>2.配置gradle<br><img src="http://i.imgur.com/CRLB7KR.jpg" alt=""></p>
+<p>3.配置构建参数<br><img src="http://i.imgur.com/XEKLPHB.jpg" alt=""></p>
+<p>4.</p>
 <p>##Java application项目配置<br><img src="http://i.imgur.com/RYJSvtu.jpg" alt=""></p>
 <p>   #首先需要修改pom.xml 添加build参数</p>
 <pre><code>&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;
@@ -369,7 +434,7 @@ zip -qr /var/www/html/garbage/release/release.zip _PublishedWebsites/
 
 
 <section id="comment">
-  <h1 class="title">Kommentare</h1>
+  <h1 class="title">Comments</h1>
 
   
 </section>
